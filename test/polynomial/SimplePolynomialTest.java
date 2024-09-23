@@ -10,6 +10,10 @@ public class SimplePolynomialTest {
   private SimplePolynomial incomingPolynomial;
   private SimplePolynomial incomingPolynomial2;
   private SimplePolynomial incomingPolynomial3;
+  private SimplePolynomial multiplyPolynomial1;
+  private SimplePolynomial multiplyPolynomial2;
+  private SimplePolynomial simplePolynomialDupe;
+
   @Before
   public void setUp() throws Exception {
     simplePolynomial = new SimplePolynomial();
@@ -30,9 +34,28 @@ public class SimplePolynomialTest {
     incomingPolynomial3.addTerm(3, 3);
     incomingPolynomial3.addTerm(2, 3);
     incomingPolynomial3.addTerm(-1, 2);
-    incomingPolynomial3.addTerm(-2, 1);
+    incomingPolynomial3.addTerm(-7, 1);
     incomingPolynomial3.addTerm(-1, 0);
     incomingPolynomial3.addTerm(-2, 5);
+
+    multiplyPolynomial1 = new SimplePolynomial();
+    multiplyPolynomial1.addTerm(3, 3);
+    multiplyPolynomial1.addTerm(2, 2);
+    multiplyPolynomial1.addTerm(1, 1);
+    multiplyPolynomial1.addTerm(3, 0);
+
+    multiplyPolynomial2 = new SimplePolynomial();
+    multiplyPolynomial2.addTerm(5, 2);
+    multiplyPolynomial2.addTerm(2, 1);
+    multiplyPolynomial2.addTerm(6, 7);
+    multiplyPolynomial2.addTerm(5, 0);
+
+    simplePolynomialDupe = new SimplePolynomial();
+    simplePolynomialDupe.addTerm(5, 3);
+    simplePolynomialDupe.addTerm(3, 2);
+    simplePolynomialDupe.addTerm(2, 1);
+    simplePolynomialDupe.addTerm(1, 0);
+
   }
 
 
@@ -53,20 +76,57 @@ public class SimplePolynomialTest {
 
   @Test
   public void testGetCoefficient() {
-    assertEquals(5, simplePolynomial.add(incomingPolynomial).getCoefficient(1));
+    assertEquals(8, simplePolynomial.add(incomingPolynomial).getCoefficient(3));
   }
 
   @Test
   public void testAddPolynomial() {
-    assertEquals("", simplePolynomial.add(incomingPolynomial).toString());
+    assertEquals("8x^3+5x^2+2x+1", simplePolynomial.add(incomingPolynomial).toString());
   }
   @Test
   public void testAddPolynomial2() {
-    assertEquals("", simplePolynomial.add(incomingPolynomial2).toString());
+    assertEquals("3x^6+5x^3+3x^2+4x+1", simplePolynomial.add(incomingPolynomial2).toString());
   }
 
   @Test
   public void testAddPolynomial3() {
-    assertEquals("", simplePolynomial.add(incomingPolynomial3).toString());
+    assertEquals("-2x^5+10x^3+2x^2-5x", simplePolynomial.add(incomingPolynomial3).toString());
+  }
+
+  @Test
+  public void testMultiplyPolynomial() {
+    assertEquals("18x^10+12x^9+6x^8+18x^7+15x^5+16x^4+24x^3+27x^2+11x+15", multiplyPolynomial1.multiply(multiplyPolynomial2).toString());
+  }
+
+  @Test
+  public void testDerivative() {
+    assertEquals("15x^2+6x+2", simplePolynomial.derivative().toString());
+  }
+
+  @Test
+  public void testEvaluate() {
+    assertEquals(4, simplePolynomial.evaluate(-3), 0);
+  }
+  @Test
+  public void testMultipleCommands() {
+    SimplePolynomial addPolynomials = new SimplePolynomial();
+    addPolynomials.addTerm(3, 6);
+    addPolynomials.addTerm(2, 4);
+    assertEquals("162x^8+96x^7+84x^6+132x^5+10x^4+48x^3+12x^2+4x+6",addPolynomials.add(incomingPolynomial2).multiply(multiplyPolynomial1).derivative().toString());
+
+  }
+
+  @Test
+  public void testEqualsFalse() {
+    assertFalse(simplePolynomial.equals(incomingPolynomial));
+  }
+  @Test
+  public void testEqualsTrue() {
+    assertTrue("Polynomials were not equal", simplePolynomial.equals(simplePolynomialDupe));
+  }
+  @Test
+  public void testHashCode() {
+    assertEquals(simplePolynomial.hashCode(), simplePolynomialDupe.hashCode());
+
   }
 }

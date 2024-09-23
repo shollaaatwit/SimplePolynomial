@@ -27,11 +27,9 @@ public class SimplePolynomial implements Polynomial {
     SimplePolynomial newPolynomial = new SimplePolynomial();
     for(int i = getDegree(); i >= 0; i--) {
       newPolynomial.addTerm(getCoefficient(i), i);
-//      simplify();
     }
     for(int i = other.getDegree(); i >= 0; i--) {
       newPolynomial.addTerm(other.getCoefficient(i), i);
-//      simplify();
     }
 
     return newPolynomial;
@@ -47,7 +45,16 @@ public class SimplePolynomial implements Polynomial {
    */
   @Override
   public Polynomial multiply(Polynomial other) {
-    return null;
+    SimplePolynomial newPolynomial = new SimplePolynomial();
+    for(int i = getDegree(); i >= 0; i--) {
+      for(int j = other.getDegree(); j >= 0; j--) {
+        int newCoefficient = getCoefficient(i) * other.getCoefficient(j);
+        int newDegree = i + j;
+        newPolynomial.addTerm(newCoefficient, newDegree);
+      }
+    }
+
+    return newPolynomial;
   }
 
   /**
@@ -59,7 +66,16 @@ public class SimplePolynomial implements Polynomial {
    */
   @Override
   public Polynomial derivative() {
-    return null;
+    SimplePolynomial newPolynomial = new SimplePolynomial();
+    for(int i = getDegree(); i >= 0; i--) {
+      int newCoefficient = getCoefficient(i) * i;
+      int newDegree = 0;
+      if(i != 0) {
+        newDegree = i-1;
+      }
+      newPolynomial.addTerm(newCoefficient, newDegree);
+    }
+    return newPolynomial;
   }
 
   /**
@@ -71,17 +87,10 @@ public class SimplePolynomial implements Polynomial {
    */
   @Override
   public void addTerm(int coefficient, int power) throws IllegalArgumentException {
-    ArrayList<Term> polynomialListNew = new ArrayList<Term>();
     if(power < 0) {
       throw new IllegalArgumentException();
     }
     Term term = new Term(coefficient, power);
-//    for(Term termFind : polynomialList) {
-//      if(termFind.getDegree() == power) {
-//        int newCoefficient = termFind.getCoefficient() + coefficient;
-//        term = new Term(newCoefficient, power);
-//      }
-//    }
     polynomialList.add(term);
 
   }
@@ -111,7 +120,11 @@ public class SimplePolynomial implements Polynomial {
    */
   @Override
   public double evaluate(double x) {
-    return 0;
+    double sum = 0;
+    for(int i = getDegree(); i >= 0; i--) {
+      sum += getCoefficient(i) * Math.pow(x, i);
+    }
+    return sum;
   }
 
   /**
@@ -123,6 +136,9 @@ public class SimplePolynomial implements Polynomial {
   @Override
   public int getCoefficient(int power) {
     int coefficient = 0;
+    if(power < 0) {
+      return 0;
+    }
     for(Term term : polynomialList) {
       if (term.getDegree() == power) {
         coefficient += term.getCoefficient();
@@ -132,25 +148,57 @@ public class SimplePolynomial implements Polynomial {
   }
 
   @Override
+  public boolean equals(Object other) {
+    if(other == null) {
+      return false;
+    }
+    SimplePolynomial other2 = (SimplePolynomial) other;
+    if(getDegree() != other2.getDegree()) {
+      return false;
+    }
+    for(int i = getDegree(); i >= 0; i--) {
+      if(getCoefficient(i) != other2.getCoefficient(i)) {
+        return false;
+      }
+    }
+    for(int i = other2.getDegree(); i >= 0; i--) {
+      if(other2.getCoefficient(i) != getCoefficient(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  @Override
+  public int hashCode() {
+    return (int)evaluate(5);
+  }
+
+  @Override
   public String toString() { //make a case for if negative, swap to subtraction
     StringBuilder resultString = new StringBuilder();
-//    for(int i = 0; i < polynomialList.size(); i++) {
     for(int i = getDegree(); i >= 0; i--) {
       int coefficient = getCoefficient(i);
+      int nextDegree = i - 1;
+      if(nextDegree <= 0) {
+        nextDegree = 0;
+      }
+      int nextCoefficient = getCoefficient(nextDegree);
       if(coefficient != 0) {
-        resultString.append(coefficient);
-//        if(polynomialList.get(i).getDegree() > 0) {
+        if(i == getDegree()) {
+          resultString.append(coefficient);
+        } else {
+          resultString.append(Math.abs(coefficient));
+        }
         if(i > 0) {
           resultString.append("x");
         }
-//        if(polynomialList.get(i).getDegree() > 1) {
         if(i > 1) {
-//          resultString.append("^" + polynomialList.get(i).getDegree());
           resultString.append("^" + i);
         }
-//        if(i != polynomialList.size() - 1) {
-        if(i != 0) {
+        if(nextCoefficient >= 0) {
           resultString.append("+");
+        } else {
+          resultString.append("-");
         }
       }
     }
